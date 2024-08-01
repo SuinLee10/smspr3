@@ -1,0 +1,206 @@
+package com.example.smspr3.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+
+public class DefaultDto {
+
+    @Builder
+    @Schema
+    @Getter
+    @Setter
+    //우리가 필요한 정보 하나씩만 받기 위해 DTO를 만듬
+    public static class FileResDto{
+        private String url;
+    }
+    @SuperBuilder
+    @Schema
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateReqDto{
+        @Schema(description = "id", example ="")
+        @NotNull
+        @NotEmpty
+        private String id;
+        @Schema(description = "deleted", example = "")
+        private String deleted;
+        @Schema(description = "process", example = "")
+        private String process;
+    }
+    @SuperBuilder
+    @Schema
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DetailReqDto{
+        @Schema(description = "id", example ="")
+        @NotNull
+        @NotEmpty
+        private String id;
+
+        @Schema(description = "tbuserId", example="")
+        private String tbuserId;
+    }
+
+    @Schema
+    @Getter
+    @Setter
+    public static class DetailResDto{
+        @Schema(description = "id", example ="")
+        private String id;
+        @Schema(description = "deleted", example = "")
+        private String deleted;
+        @Schema(description = "process", example = "")
+        private String process;
+        @Schema(description = "createdAt", example = "")
+        private String createdAt;
+        @Schema(description = "modifiedAt", example = "")
+        private String modifiedAt;
+    }
+
+    @SuperBuilder
+    @Schema
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ListReqDto{
+        @Schema(description = "deleted", example = "")
+        private String deleted;
+        @Schema(description = "process", example = "")
+        private String process;
+    }
+
+    @SuperBuilder
+    @Schema
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PagedListReqDto{
+        @Schema(description = "callpage", example = "")
+        private Integer callpage;
+        @Schema(description = "perpage", example = "")
+        private Integer perpage;
+        @Schema(description = "orderby", example = "")
+        private String orderby;
+        @Schema(description = "orderway", example = "")
+        private String orderway;
+
+        @Schema(description = "offset", example = "")
+        private Integer offset;
+        @Schema(description = "deleted", example = "")
+        private String deleted;
+        @Schema(description = "process", example = "")
+        private String process;
+
+    public int[] init(int listsize){
+        if(orderby == null || orderby.isEmpty()){
+            orderby = "created_at";
+        }
+        if(orderway == null || orderway.isEmpty()){
+            orderway = "desc";
+        }
+        if(perpage == null || perpage < 1){
+            perpage = 10;
+        }
+        if(callpage == null){
+            callpage = 1;
+        }
+        if(callpage < 1){
+            callpage = 1;
+        }
+
+        int pagesize = listsize / perpage;
+        if(listsize % perpage > 0){
+            pagesize++;
+        }
+        if(callpage > pagesize){
+            callpage = pagesize;
+        }
+        offset = (callpage - 1)*perpage;
+        int[] res = {listsize, pagesize};
+        return res;
+    }
+    public PagedListResDto afterBuild(int[] resSize, Object list){
+        return PagedListResDto.builder()
+                .callpage(callpage)
+                .perpage(perpage)
+                .orderby(orderby)
+                .orderway(orderway)
+                .listsize(resSize[0])
+                .pagesize(resSize[1])
+                .list(list)
+                .build();
+        }
+    }
+
+    @SuperBuilder
+    @Schema
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PagedListResDto {
+        @Schema(description = "callpage", example = "")
+        private Integer callpage;
+        @Schema(description = "perpage", example = "")
+        private Integer perpage;
+        @Schema(description = "orderby", example = "")
+        private String orderby;
+        @Schema(description = "orderway", example = "")
+        private String orderway;
+
+        @Schema(description = "listsize", example = "")
+        private Integer listsize;
+        @Schema(description = "pagesize", example = "")
+        private Integer pagesize;
+
+        @Schema(description = "list", example = "")
+        private Object list;
+    }
+
+    @SuperBuilder
+    @Schema
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ScrollListReqDto{
+        @Schema(description = "cursor", example ="")
+        private String cursor;
+        @Schema(description = "perpage", example = "")
+        private Integer perpage;
+        @Schema(description = "orderby", example = "")
+        private String orderby;
+        @Schema(description = "orderway", example = "")
+        private String orderway;
+
+        @Schema(description = "deleted", example = "")
+        private String deleted;
+        @Schema(description = "process", example = "")
+        private String process;
+
+        @Schema(description = "tbuserId", example="")
+        private String tbuserId;
+
+        public void init(){
+            if(orderby == null || orderby.isEmpty()){
+                orderby = "created_at";
+            }
+            if(orderway == null || orderway.isEmpty()){
+                orderway = "desc";
+            }
+            if(perpage == null || perpage < 1){
+                perpage = 10;
+            }
+        }
+    }
+
+}

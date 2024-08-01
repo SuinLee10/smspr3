@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <link href="/css/header.css" rel="stylesheet">
+    <link href="/css/login.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="nav-bar">
+    <div class="header">
+        <div class="nav">
+            <img src="/img/hisports.svg" alt="hisports">
+            <ul class="menu">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="gallery.html">gallery</a></li>
+                <li><a href="inform.html">Info</a></li>
+                <li><a href="aboutus.html">aboutus</a></li>
+            </ul>
+            <div class="buttons">
+                <button onclick="location.href='tbuser/login.html'" class="btn" id="signin-btn">Sign In</button>
+                <button onclick="location.href='tbuser/signup.html'" class="btn" id="signup-btn">Join</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="login_container">
+<div class="logincard">
+<input type="text" id="create_tbuser_username" placeholder="username"/>
+<input type="text" id="create_tbuser_password" placeholder="password"/>
+
+<button class="login_btn" onclick="login()">login</button>
+</div>
+</div>
+
+<script>
+    function login(){
+        $.ajax({
+            url: "/api/tbuser/login",
+            type: "POST",
+            contentType : 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                username : $("#create_tbuser_username").val()
+                ,password : $("#create_tbuser_password").val()
+            }),
+            cache: false,
+            success: (data, status, xhr)=>{
+                if(data["id"] === "not matched"){
+                    alert("아이디와 비밀번호가 올바르지 않습니다.");
+                } else {
+                    localStorage.setItem("myTbuserId", data["id"]);
+                    location.replace("/index");
+                }
+                //alert(JSON.stringify(data));
+            },
+            error: (data, status, xhr)=>{
+                alert("error!!");
+                alert(JSON.stringify(data));
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

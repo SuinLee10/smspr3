@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.8/handlebars.min.js"></script>
+
+</head>
+<script id="list_info_tbfeedfile" type="text/x-handlebars-template">
+{{#resultData_tbfeedfile}}
+    <div>
+        <img height="50px" src="{{url}}" alt=""/>
+        <input type="text" class="create_tbfeed_img_type" value="{{type}}"/>
+        <input type="text" class="create_tbfeed_img_url" value="{{url}}"/>
+        <button onclick="listener_remove_img(this)">삭제</button>
+    </div>
+    {{/resultData_tbfeedfile}}
+</script>
+<script type="text/javascript">
+    var list_info_tbfeedfile = $("#list_info_tbfeedfile").html();
+    var list_info_tbfeedfile_template = Handlebars.compile(list_info_tbfeedfile);
+</script>
+<body>
+
+title :
+<input type="text" id="create_tbfeed_title" />
+content :
+<input type="text" id="create_tbfeed_content" />
+
+<button onclick ="$('#create_tbfeed_img').trigger('click')">upload</button>
+<label for="create_tbfeed_img">이미지 추가.</label>
+<input type="file" id="create_tbfeed_img" onchange="readURLFile(this)" accept="image/*" />
+
+<div id = "div_create_tbfeed_imgs">
+
+</div>
+<script>
+    function listener_remove_img(obj){
+        $(obj).parent().remove();
+    }
+</script>
+<script>
+    let limit_each_file_size = 10;
+    function readURLFile(input){
+        let temp_id = $(input).attr("id") + "";
+        if(input.files && input.files[0]){
+            let reader = new FileReader();
+            reader.readAsDataURL(input.files[0]);
+            reader.onload = function(e){
+                let temp_each_file_size = input.files[0].size / (1024 * 1024);
+                if(temp_each_file_size > limit_each_file_size){
+                    alert("파일 1개 당 " + limit_each_file_size + "mb 용량 제한 초과 입니다!");
+                    $(input).val("");
+                    return false;
+                }
+                let file_type = "image";
+                if(!input.files[0].type.match('image.*')){
+                    file_type = "file";
+                }else{
+                    file_type = "image";
+                }
+                //alert(input.files[0].name);
+                listener_upload_file(input.files[0], file_type);
+            }
+        }
+    }
+    function listener_upload_file(obj_file, file_type) {
+        let fileData = new FormData();
+        fileData.append("file", obj_file);
+
+        $.ajax({
+            url: "/api/default/uploadFile",
+            type: "POST",
+            data: fileData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: (data, status, xhr) => {
+                switch (xhr.status) {
+                    case 201:
+                        let a_list = [];
+                        let each_data = {};
+                        a_list.push(each_data);
+                        each_data["type"] = file_type;
+                        each_data["url"] = data["url"];
+                        $("#div_create_tbfeed_imgs").append(list_info_tbfeedfile_template({"resultData_tbfeedfile": a_list}))
+
+                        break;
+                    default:
+                        console.log("no matching status code");
+                }
+            },
+            error: (data) => {
+                alert("error")
+            },
+        });
+    }
+</script>
+<button onclick="create_tbfeed()">create</button>
+<a href="/tbfeed/mlist">link to list</a>
+<script>
+    function create_tbfeed(){
+        let tbuserId = localStorage.getItem("myTbuserId");
+        if (tbuserId == null || tbuserId === "") {
+            alert("로그인 이전입니다!!");
+            return false;
+        }
+
+        let tbfeedfile_type = [];
+        let create_tbfeed_img_types = $(".create_tbfeed_img_type");
+        for(let each of create_tbfeed_img_types){
+            tbfeedfile_type.push($(each).val());
+        }
+
+        let tbfeedfile_url = [];
+        let create_tbfeed_img_urls = $(".create_tbfeed_img_url");
+        for(let each of create_tbfeed_img_urls){
+            tbfeedfile_url.push($(each).val());
+        }
+
+        $.ajax({
+            url: "/api/tbfeed",
+            type: "POST",
+            contentType : 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                tbuserId : tbuserId
+                ,title:$("#create_tbfeed_title").val()
+                ,content:$("#create_tbfeed_content").val()
+                ,tbfeedfileTypes: tbfeedfile_type
+                ,tbfeedfileUrls: tbfeedfile_url
+            }),
+            cache: false,
+            success:(data, status,xhr)=>{
+                alert("success!!");
+            },
+            error:(data,status,xhr)=>{
+                alert("error!!");
+                alert(JSON.stringify(data));
+            }
+        });
+    }
+</script>
+</body>
+</html>

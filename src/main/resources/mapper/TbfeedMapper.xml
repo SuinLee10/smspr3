@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.smspr3.mapper.TbfeedMapper">
+    <select id="detail" parameterType="hashMap" resultType="com.example.smspr3.dto.TbfeedDto$DetailResDto">
+        SELECT tbfeed.id
+            ,tbfeed.deleted
+            ,tbfeed.process
+            ,tbfeed.created_at as createdAt
+            ,tbfeed.modified_at as modifiedAt
+
+            ,tbfeed.tbuser_id as tbuserId
+            ,tbfeed.title
+            ,tbfeed.content
+
+            ,tbuser.name as tbuserName
+            ,tbuser.nick as tbuserNick
+            ,tbuser.img as tbuserImg
+
+        FROM tbfeed, tbuser
+        WHERE tbfeed.id = #{id}
+        AND tbfeed.tbuser_id = tbuser.id
+    </select>
+    <select id="list" parameterType="hashMap" resultType="com.example.smspr3.dto.TbfeedDto$DetailResDto">
+        SELECT tbfeed.id
+        FROM tbfeed
+        WHERE tbfeed.id is not NULL
+        <if test = "deleted != null and deleted != ''">AND tbfeed.deleted = #{deleted}</if>
+        <if test = "tbuserId != null and tbuserId != ''">AND tbfeed.tbuser_id = #{tbuserId}</if>
+        <if test = "title != null and title != ''">AND tbfeed.title LIKE CONCAT('%', #{title}, '%')</if>
+        ORDER BY tbfeed.created_at DESC
+    </select>
+    <select id="scrollList" parameterType="hashMap" resultType="com.example.smspr3.dto.TbfeedDto$DetailResDto">
+        SELECT tbfeed.id
+        FROM tbfeed
+        WHERE tbfeed.id is not NULL
+        <if test = "deleted != null and deleted != ''">AND tbfeed.deleted = #{deleted}</if>
+        <if test = "tbuserId != null and tbuserId != ''">AND tbfeed.tbuser_id = #{tbuserId}</if>
+        <if test = "title != null and title != ''">AND tbfeed.title LIKE CONCAT('%', #{title}, '%')</if>
+
+        <if test = "orderby == 'created_at'">
+            <if test = "orderway == 'desc'">
+                <if test = "cursor != null and cursor != ''">AND STR_TO_DATE(#{cursor}, '%Y-%m-%d %H:%i:%s.%f') > tbfeed.created_at</if>
+                ORDER BY tbfeed.created_at DESC
+            </if>
+            <if test = "orderway == 'asc'">
+                <if test = "cursor != null and cursor != ''">AND tbfeed.created_at > STR_TO_DATE(#{cursor}, '%Y-%m-%d %H:%i:%s.%f')</if>
+                ORDER BY tbfeed.created_at ASC
+            </if>
+        </if>
+         <if test = "orderby == title">
+            <if test = "orderway =='desc'">
+               <if test ="cursor != null and cursor != ''">AND #{cursor} > tbfeed.title</if>
+                ORDER BY tbfeed.title DESC
+            </if>
+             <if test = "orderway =='asc'">
+                 <if test ="cursor != null and cursor != ''"> AND tbfeed.title > #{cursor}</if>
+                 ORDER BY tbfeed.title ASC
+             </if>
+         </if>
+        LIMIT 0, #{perpage}
+    </select>
+    <select id="pagedList" parameterType="hashMap" resultType="com.example.smspr3.dto.TbfeedDto$DetailResDto">
+        SELECT tbfeed.id
+        FROM tbfeed
+        WHERE tbfeed.id is not NULL
+        <if test = "deleted != null and deleted != ''">AND tbfeed.deleted = #{deleted}</if>
+        <if test = "tbuserId != null and tbuserId != ''">AND tbfeed.tbuser_id = #{tbuserId}</if>
+        <if test = "title != null and title != ''">AND tbfeed.title LIKE CONCAT('%', #{title}, '%')</if>
+
+        <if test = "orderby =='created_at'">ORDER BY tbfeed.created_at</if>
+        <if test = "orderby == 'title'">ORDER BY tbfeed.title</if>
+        <if test = "orderway == 'asc'">ASC</if>
+        <if test = "orderway == 'desc'">DESC</if>
+        LIMIT #{offset}, #{perpage}
+    </select>
+    <select id ="pagedListCount" parameterType="hashMap" resultType="Integer">
+        SELECT count(tbfeed.id) as listsize
+        FROM tbfeed
+        WHERE tbfeed.id is not NULL
+        <if test = "deleted != null and deleted != ''">AND tbfeed.deleted = #{deleted}</if>
+        <if test ="tbuserId != null and tbuserId != ''">AND tbfeed.tbuser_id = #{tbuserId}</if>
+        <if test = "title != null and title != ''">AND tbfeed.title LIKE CONCAT('%', #{title}, '%')</if>
+    </select>
+</mapper>

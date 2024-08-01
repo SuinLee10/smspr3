@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.smspr3.mapper.TbfeedcmtMapper">
+    <select id="detail" parameterType="hashMap" resultType="com.example.smspr3.dto.TbfeedcmtDto$DetailResDto">
+        SELECT tbfeedcmt.id
+            ,tbfeedcmt.deleted
+            ,tbfeedcmt.process
+            ,tbfeedcmt.created_at as createdAt
+            ,tbfeedcmt.modified_at as modifiedAt
+
+            ,tbfeedcmt.tbfeed_id as tbfeedId
+             ,tbfeedcmt.tbuser_id as tbuserId
+             ,tbfeedcmt.content
+
+        FROM tbfeedcmt
+        WHERE tbfeedcmt.id = #{id}
+    </select>
+    <select id="list" parameterType="hashMap" resultType="com.example.smspr3.dto.TbfeedcmtDto$DetailResDto">
+        SELECT tbfeedcmt.id
+        FROM tbfeedcmt
+        WHERE tbfeedcmt.id is not NULL
+        <if test = "deleted != null and deleted !=''">AND tbfeedcmt.deleted = #{deleted}</if>
+        <if test = "tbfeedId != null and tbfeedId !=''">AND tbfeedcmt.tbfeed_id = #{tbfeedId}</if>
+        <if test = "tbuserId != null and tbuserId !=''">AND tbfeedcmt.tbuser_id = #{tbuserId}</if>
+        ORDER BY tbfeedcmt.created_at DESC
+    </select>
+    <select id="scrollList" parameterType="hashMap" resultType="com.example.smspr3.dto.TbfeedcmtDto$DetailResDto">
+        SELECT tbfeedcmt.id
+        FROM tbfeedcmt
+        WHERE tbfeedcmt.id is not NULL
+        <if test = "deleted != null and deleted !=''">AND tbfeedcmt.deleted = #{deleted}</if>
+        <if test = "tbfeedId != null and tbfeedId !=''">AND tbfeedcmt.tbfeed_id = #{tbfeedId}</if>
+        <if test = "tbuserId != null and tbuserId !=''">AND tbfeedcmt.tbuser_id = #{tbuserId}</if>
+
+          <if test = "orderby =='created_at'">
+            <if test = "orderway =='desc'">
+                <if test = "cursor != null and cursor !=''">AND STR_TO_DATE(#{cursor}, '%Y-%m-%d %H:%i:%s.%f') > tbfeedcmt.created_at </if>
+                ORDER BY tbfeedcmt.created_at DESC
+            </if>
+            <if test = "orderway =='asc'">
+                <if test = "cursor != null and cursor !=''">AND tbfeedcmt.created_at > STR_TO_DATE(#{cursor}, '%Y-%m-%d %H:%i:%s.%f')</if>
+                ORDER BY tbfeedcmt.created_at ASC
+            </if>
+        </if>
+        <if test = "orderby =='tbuserId'">
+            <if test = "orderway =='desc'">
+                <if test = "cursor != null and cursor !=''">AND #{cursor} > tbfeedcmt.tbuserId</if>
+                ORDER BY tbfeedcmt.tbuserId DESC
+            </if>
+            <if test = "orderway =='asc'">
+                <if test = "cursor != null and cursor !=''">AND tbfeedcmt.tbuserId > #{cursor}</if>
+                ORDER BY tbfeedcmt.tbuserId ASC
+            </if>
+        </if>
+        LIMIT 0, #{perpage}
+    </select>
+    <select id="pagedList" parameterType="hashMap" resultType="com.example.smspr3.dto.TbfeedcmtDto$DetailResDto">
+        SELECT tbfeedcmt.id
+        FROM tbfeedcmt
+        WHERE tbfeedcmt.id is not NULL
+        <if test = "deleted != null and deleted !=''">AND tbfeedcmt.deleted = #{deleted}</if>
+        <if test = "tbfeedId != null and tbfeedId !=''">AND tbfeedcmt.tbfeed_id = #{tbfeedId}</if>
+        <if test = "tbuserId != null and tbuserId !=''">AND tbfeedcmt.tbuser_id = #{tbuserId}</if>
+
+        <if test = "orderby =='created_at'">ORDER BY tbfeedcmt.created_at </if>
+        <if test = "orderby =='tbuserId'">ORDER BY tbfeedcmt.tbuserId </if>
+        <if test = "orderway =='asc'">ASC</if>
+        <if test = "orderway =='desc'">DESC</if>
+        LIMIT #{offset}, #{perpage}
+    </select>
+    <select id ="pagedListCount" parameterType="hashMap" resultType="Integer">
+        SELECT count(tbfeedcmt.id) as listsize
+        FROM tbfeedcmt
+        WHERE tbfeedcmt.id is not NULL
+        <if test = "deleted != null and deleted !=''">AND tbfeedcmt.deleted = #{deleted}</if>
+        <if test = "tbfeedId != null and tbfeedId !=''">AND tbfeedcmt.tbfeed_id = #{tbfeedId}</if>
+        <if test = "tbuserId != null and tbuserId !=''">AND tbfeedcmt.tbuser_id = #{tbuserId}</if>
+    </select>
+</mapper>

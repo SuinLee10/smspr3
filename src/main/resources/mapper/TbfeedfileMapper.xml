@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.smspr3.mapper.TbfeedfileMapper">
+    <select id="detail" parameterType="hashMap" resultType="com.example.smspr3.dto.TbfeedfileDto$DetailResDto">
+        SELECT tbfeedfile.id
+             ,tbfeedfile.deleted
+             ,tbfeedfile.process
+             ,tbfeedfile.created_at as createdAt
+             ,tbfeedfile.modified_at as modifiedAt
+
+             ,tbfeedfile.tbfeed_id as tbfeedId
+             ,tbfeedfile.type
+             ,tbfeedfile.url
+
+        FROM tbfeedfile
+        WHERE tbfeedfile.id = #{id}
+    </select>
+    <select id="list" parameterType="hashMap" resultType="com.example.smspr3.dto.TbfeedfileDto$DetailResDto">
+        SELECT tbfeedfile.id
+        FROM tbfeedfile
+        WHERE tbfeedfile.id is not NULL
+        <if test = "deleted != null and deleted !=''">AND tbfeedfile.deleted = #{deleted}</if>
+        <if test = "tbfeedId != null and tbfeedId !=''">AND tbfeedfile.tbfeed_id = #{tbfeedId}</if>
+        <if test = "type != null and type !=''">AND tbfeedfile.type = #{type}</if>
+        ORDER BY tbfeedfile.created_at DESC
+    </select>
+    <select id="scrollList" parameterType="hashMap" resultType="com.example.smspr3.dto.TbfeedfileDto$DetailResDto">
+        SELECT tbfeedfile.id
+        FROM tbfeedfile
+        WHERE tbfeedfile.id is not NULL
+        <if test = "deleted != null and deleted !=''">AND tbfeedfile.deleted = #{deleted}</if>
+        <if test = "tbfeedId != null and tbfeedId !=''">AND tbfeedfile.tbfeed_id = #{tbfeedId}</if>
+        <if test = "type != null and type !=''">AND tbfeedfile.type = #{type}</if>
+
+        <if test = "orderby =='created_at'">
+            <if test = "orderway =='desc'">
+                <if test = "cursor != null and cursor !=''">AND STR_TO_DATE(#{cursor}, '%Y-%m-%d %H:%i:%s.%f') > tbfeedfile.created_at </if>
+                ORDER BY tbfeedfile.created_at DESC
+            </if>
+            <if test = "orderway =='asc'">
+                <if test = "cursor != null and cursor !=''">AND tbfeedfile.created_at > STR_TO_DATE(#{cursor}, '%Y-%m-%d %H:%i:%s.%f')</if>
+                ORDER BY tbfeedfile.created_at ASC
+            </if>
+        </if>
+        <if test = "orderby =='type'">
+            <if test = "orderway =='desc'">
+                <if test = "cursor != null and cursor !=''">AND #{cursor} > tbfeedfile.type</if>
+                ORDER BY tbfeedfile.type DESC
+            </if>
+            <if test = "orderway =='asc'">
+                <if test = "cursor != null and cursor !=''">AND tbfeedfile.type > #{cursor}</if>
+                ORDER BY tbfeedfile.type ASC
+            </if>
+        </if>
+        LIMIT 0, #{perpage}
+    </select>
+    <select id="pagedList" parameterType="hashMap" resultType="com.example.smspr3.dto.TbfeedfileDto$DetailResDto">
+        SELECT tbfeedfile.id
+        FROM tbfeedfile
+        WHERE tbfeedfile.id is not NULL
+        <if test = "deleted != null and deleted !=''">AND tbfeedfile.deleted = #{deleted}</if>
+        <if test = "tbfeedId != null and tbfeedId !=''">AND tbfeedfile.tbfeed_id = #{tbfeedId}</if>
+        <if test = "type != null and type !=''">AND tbfeedfile.type = #{type}</if>
+
+        <if test = "orderby =='created_at'">ORDER BY tbfeedfile.created_at </if>
+        <if test = "orderby =='type'">ORDER BY tbfeedfile.type </if>
+        <if test = "orderway =='asc'">ASC</if>
+        <if test = "orderway =='desc'">DESC</if>
+        LIMIT #{offset}, #{perpage}
+    </select>
+    <select id ="pagedListCount" parameterType="hashMap" resultType="Integer">
+        SELECT count(tbfeedfile.id) as listsize
+        FROM tbfeedfile
+        WHERE tbfeedfile.id is not NULL
+        <if test = "deleted != null and deleted !=''">AND tbfeedfile.deleted = #{deleted}</if>
+        <if test = "tbfeedId != null and tbfeedId !=''">AND tbfeedfile.tbfeed_id = #{tbfeedId}</if>
+        <if test = "type != null and type !=''">AND tbfeedfile.type = #{type}</if>
+    </select>
+</mapper>

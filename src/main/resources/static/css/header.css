@@ -1,0 +1,80 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+.nav-bar {
+    width: 100%;
+    background-color: #ddd;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    height: 80px; /* nav-bar의 두께를 80px로 설정 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.header {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.nav img {
+    height: 130px; /* 로고의 높이를 60px로 설정 */
+    margin-right: 20px; /* 로고와 텍스트 사이의 간격 설정 */
+}
+
+.nav .menu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.nav .menu li {
+    margin: 0 15px;
+}
+
+.nav .menu a {
+    color: black;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.nav .menu a:hover {
+    text-decoration: underline;
+}
+
+.buttons {
+    display: flex;
+    align-items: center;
+}
+
+.btn {
+    background-color: rgba(2, 130, 2, 1);/* 녹색 배경 */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-left: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn:hover {
+    background-color: #45a049; /* hover 상태의 색상 */
+}

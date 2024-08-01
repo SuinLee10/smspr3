@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+
+    <link href="/css/header.css" rel="stylesheet">
+    <link href="/css/signup.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="nav-bar">
+    <div class="header">
+        <div class="nav">
+            <img src="/img/hisports.svg" alt="hisports">
+            <ul class="menu">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="gallery.html">gallery</a></li>
+                <li><a href="inform.html">Info</a></li>
+                <li><a href="aboutus.html">aboutus</a></li>
+            </ul>
+            <div class="buttons">
+                <button onclick="location.href='tbuser/login.html'" class="btn" id="signin-btn">Sign In</button>
+                <button onclick="location.href='tbuser/signup.html'" class="btn" id="signup-btn">Join</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="signup_container">
+    <div class="signupcard">
+<input type="text" id="create_tbuser_username" placeholder="username"/>
+<input type="text" id="create_tbuser_password" placeholder="password" />
+
+<button class="signup_btn" onclick="signup_tbuser()">signup</button><br>
+<a href="/tbuser/login">go to login</a>
+<a href="/tbuser/mlist">link to Scroll list</a>
+    </div>
+</div>
+<script>
+    function signup_tbuser(){
+        $.ajax({
+            url: "/api/tbuser/signup",
+            type: "POST",
+            contentType : 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                username : $("#create_tbuser_username").val()
+                ,password : $("#create_tbuser_password").val()
+            }),
+            cache: false,
+            success: (data, status, xhr)=>{
+                alert("success!!");
+                //alert(JSON.stringify(data));
+            },
+            error: (data, status, xhr)=>{
+                alert("error!!");
+                alert(JSON.stringify(data));
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

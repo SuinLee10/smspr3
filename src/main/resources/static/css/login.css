@@ -1,0 +1,32 @@
+.login_container{
+    display: flex;
+    justify-content: center;
+}
+.logincard {
+    padding: 200px;
+    background-color: #fff;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 300px;
+}
+
+.login_btn{
+    background-color: rgba(2, 130, 2, 1);/* 녹색 배경 */
+    color: white;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    width: 80%;
+    height: 40px;
+}
+.login_btn:hover {
+    background-color: #45a049; /* hover 상태의 색상 */
+}
+.logincard input {
+    display: block;
+    margin: 10px auto;
+    padding: 10px;
+    width: 80%;
+    box-sizing: border-box;
+}

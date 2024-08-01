@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <link href="/css/header.css" rel="stylesheet">
+    <link href="/css/login.css" rel="stylesheet">
+    <link href="/css/index.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="nav-bar">
+    <div class="header">
+        <div class="nav">
+            <img src="/img/hisports.svg" alt="hisports">
+            <ul class="menu">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="gallery.html">gallery</a></li>
+                <li><a href="inform.html">Info</a></li>
+                <li><a href="aboutus.html">aboutus</a></li>
+            </ul>
+            <div class="buttons">
+                <div id="auth-buttons">
+                    <!-- 로그인 이전에 보여질 버튼 -->
+                    <button onclick="location.href='tbuser/login.html'" class="btn" id="signin-btn">Sign In</button>
+                    <button onclick="location.href='tbuser/signup.html'" class="btn" id="signup-btn">Join</button>
+
+                    <!-- 로그인 이후에 보여질 버튼 (초기에는 숨김) -->
+                    <button onclick="logout()" class="btn" id="logout-btn" style="display:none;">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="image-container">
+    <img src="/img/field.jpeg" alt="field" class="field-img">
+    <img src="/img/SportsMatching.svg" alt="Sports Matching" class="overlay-img">
+</div>
+
+<script>
+    $(document).ready(function() {
+        let myTbuserId = localStorage.getItem("myTbuserId");
+        if(myTbuserId == null || myTbuserId === ""){
+            // 로그인 이전
+            $('#signin-btn, #signup-btn').show();
+            $('#logout-btn').hide();
+        } else {
+            // 로그인 이후
+            $('#signin-btn, #signup-btn').hide();
+            $('#logout-btn').show();
+        }
+    });
+
+    function logout(){
+        localStorage.clear();
+        alert("로그아웃 완료!!");
+        location.reload();
+    }
+</script>
+
+</body>
+</html>
