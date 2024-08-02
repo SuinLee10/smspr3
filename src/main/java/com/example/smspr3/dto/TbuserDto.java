@@ -9,7 +9,38 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 public class TbuserDto {
-
+    @Builder
+    @Schema
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    //우리가 필요한 정보 하나씩만 받기 위해 DTO를 만듬
+    public static class ConfirmReqDto {
+        @Schema(description = "username", example = "")
+        @NotNull
+        @NotEmpty
+        @Size(max = 400)
+        private String username;
+        @Schema(description = "number", example = "")
+        @NotNull
+        @NotEmpty
+        private String number;
+    }
+    @Builder
+    @Schema
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    //우리가 필요한 정보 하나씩만 받기 위해 DTO를 만듬
+    public static class UidReqDto {
+        @Schema(description = "username", example = "")
+        @NotNull
+        @NotEmpty
+        @Size(max = 400)
+        private String username;
+    }
     @Builder
     @Schema
     @Getter

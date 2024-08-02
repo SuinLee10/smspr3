@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TbuserRepository extends JpaRepository<Tbuser,String> {
+    Tbuser findByUsername(String username);
     Tbuser findByUsernameAndPassword(String username, String password);
 
 }

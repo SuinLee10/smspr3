@@ -1,11 +1,16 @@
 package com.example.smspr3.service.impl;
 
+import com.example.smspr3.domain.Tbemail;
 import com.example.smspr3.domain.Tbuser;
 import com.example.smspr3.dto.DefaultDto;
+import com.example.smspr3.dto.TbemailDto;
 import com.example.smspr3.dto.TbuserDto;
 import com.example.smspr3.mapper.TbuserMapper;
+import com.example.smspr3.repository.TbemailRepository;
 import com.example.smspr3.repository.TbuserRepository;
 import com.example.smspr3.service.TbuserService;
+import com.example.smspr3.util.SendEmail;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,14 +20,77 @@ import java.util.List;
 public class TbuserServiceImpl implements TbuserService {
     private final TbuserRepository tbuserRepository;
     private final TbuserMapper tbuserMapper;
+    private final SendEmail sendEmail;
+    private final TbemailRepository tbemailRepository;
+
     public TbuserServiceImpl(
             TbuserRepository tbuserRepository
-            ,TbuserMapper tbuserMapper
+            , SendEmail sendEmail
+            , TbuserMapper tbuserMapper
+            , TbemailRepository tbemailRepository
     ){
         this.tbuserRepository = tbuserRepository;
+        this.sendEmail = sendEmail;
         this.tbuserMapper = tbuserMapper;
+        this.tbemailRepository = tbemailRepository;
     }
 
+    @Override
+    public TbuserDto.CreateResDto confirm(TbuserDto.ConfirmReqDto param){
+        Tbemail tbemail = tbemailRepository.findByUsernameAndNumber(param.getUsername(), param.getNumber());
+        if(tbemail == null){
+            return TbuserDto.CreateResDto.builder().id("not matched").build();
+        }else{
+            tbemailRepository.delete(tbemail);
+            return TbuserDto.CreateResDto.builder().id("ok").build();
+        }
+    }
+    @Transactional
+    @Override
+    public TbuserDto.CreateResDto email(TbuserDto.UidReqDto param){
+        Tbuser tbuser = tbuserRepository.findByUsername(param.getUsername());
+        if(tbuser == null){
+            String number = "";
+            for(int i = 0; i < 6; i++){
+                int random_0to9 = (int)(Math.random() * 10);
+                number += random_0to9 + "";
+            }
+            try{
+                Tbemail tbemail = tbemailRepository.findByUsername(param.getUsername());
+                if(tbemail == null){
+                    tbemailRepository.save(TbemailDto.CreateReqDto.builder().username(param.getUsername()).number(number).build().toEntity());
+                } else {
+                    tbemail.setNumber(number);
+                    tbemailRepository.save(tbemail);
+                }
+                System.out.println("number : " + number);
+                sendEmail.send(param.getUsername(),"이메일 인증입니다", "인증번호 : " + number);
+            }catch(Exception e){
+
+            }return TbuserDto.CreateResDto.builder().id("ok").build();
+        }else{
+            return TbuserDto.CreateResDto.builder().id("already").build();
+        }
+    }
+    @Override
+    public TbuserDto.CreateResDto id(TbuserDto.UidReqDto param){
+        //금지된 단어를 사용하는 경우 가입 불가!
+        String[] ids = {"admin", "user", "fxxx"};
+        for(String id : ids){
+            if((param.getUsername()).contains(id)){
+                return TbuserDto.CreateResDto.builder().id("not").build();
+            }
+        }
+
+        Tbuser tbuser = tbuserRepository.findByUsername(param.getUsername());
+        if(tbuser == null){
+            //이거는 중복 아니어서 가입 가능!
+            return TbuserDto.CreateResDto.builder().id("ok").build();
+        } else {
+            //이거는 중복 가입 뷸가능!
+            return TbuserDto.CreateResDto.builder().id("already").build();
+        }
+    }
     @Override
     public TbuserDto.CreateResDto login(TbuserDto.LoginReqDto param) {
         Tbuser tbuser = tbuserRepository.findByUsernameAndPassword(param.getUsername(), param.getPassword());
