@@ -7,42 +7,85 @@ import com.example.smspr3.dto.TbemailDto;
 import com.example.smspr3.dto.TbuserDto;
 import com.example.smspr3.mapper.TbuserMapper;
 import com.example.smspr3.repository.TbemailRepository;
+import com.example.smspr3.repository.TbrefreshtokenRepository;
 import com.example.smspr3.repository.TbuserRepository;
 import com.example.smspr3.service.TbuserService;
+import com.example.smspr3.util.AES256Cipher;
+import com.example.smspr3.util.NowDate;
 import com.example.smspr3.util.SendEmail;
+import com.example.smspr3.util.TokenFactory;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class TbuserServiceImpl implements TbuserService {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final TbuserRepository tbuserRepository;
     private final TbuserMapper tbuserMapper;
     private final SendEmail sendEmail;
+    private final TokenFactory tokenFactory;
     private final TbemailRepository tbemailRepository;
+    private final TbrefreshtokenRepository tbrefreshtokenRepository;
+
 
     public TbuserServiceImpl(
             TbuserRepository tbuserRepository
             , SendEmail sendEmail
             , TbuserMapper tbuserMapper
+            , TokenFactory tokenFactory
             , TbemailRepository tbemailRepository
-    ){
+            , TbrefreshtokenRepository tbrefreshtokenRepository
+            ){
         this.tbuserRepository = tbuserRepository;
         this.sendEmail = sendEmail;
         this.tbuserMapper = tbuserMapper;
+        this.tokenFactory = tokenFactory;
         this.tbemailRepository = tbemailRepository;
+        this.tbrefreshtokenRepository = tbrefreshtokenRepository;
     }
 
+    public String encryptPw(String pw){
+        String newPw = "";
+        try{
+            logger.info("try!!!");
+            String secretKey = "1234567890123456";
+            newPw = AES256Cipher.AES_Encode(secretKey, pw);
+        }catch (Exception e){
+            throw new RuntimeException("AES encrypt failed");
+        }
+        return newPw;
+    }
+
+    @Override
+    public TbuserDto.CreateResDto access(TbuserDto.AccessReqDto param){
+        String accessToken = tokenFactory.accessToken(param.getRefreshToken());
+        return TbuserDto.CreateResDto.builder().id(accessToken).build();
+    }
     @Override
     public TbuserDto.CreateResDto confirm(TbuserDto.ConfirmReqDto param){
         Tbemail tbemail = tbemailRepository.findByUsernameAndNumber(param.getUsername(), param.getNumber());
         if(tbemail == null){
             return TbuserDto.CreateResDto.builder().id("not matched").build();
         }else{
-            tbemailRepository.delete(tbemail);
-            return TbuserDto.CreateResDto.builder().id("ok").build();
+           String now = new NowDate().getNow();
+           String due = tbemail.getDue();
+
+           String[] arrayTemp = {now, due};
+           Arrays.sort(arrayTemp);
+           System.out.println(now + "//" + due + "// => " + arrayTemp[0]);
+
+           if(now.equals(arrayTemp[1])){
+               return TbuserDto.CreateResDto.builder().id("expired").build();
+           }
+           tbemail.setProcess("done");
+           tbemailRepository.save(tbemail);
+           return TbuserDto.CreateResDto.builder().id("ok").build();
         }
     }
     @Transactional
@@ -55,10 +98,14 @@ public class TbuserServiceImpl implements TbuserService {
                 int random_0to9 = (int)(Math.random() * 10);
                 number += random_0to9 + "";
             }
+            //email 보내기
             try{
+                String due = "";
+                due = new NowDate().getDue(180);
+
                 Tbemail tbemail = tbemailRepository.findByUsername(param.getUsername());
                 if(tbemail == null){
-                    tbemailRepository.save(TbemailDto.CreateReqDto.builder().username(param.getUsername()).number(number).build().toEntity());
+                    tbemailRepository.save(TbemailDto.CreateReqDto.builder().username(param.getUsername()).number(number).due(due).build().toEntity());
                 } else {
                     tbemail.setNumber(number);
                     tbemailRepository.save(tbemail);

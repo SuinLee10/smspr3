@@ -16,6 +16,20 @@ public class TbuserDto {
     @AllArgsConstructor
     @NoArgsConstructor
     //우리가 필요한 정보 하나씩만 받기 위해 DTO를 만듬
+    public static class AccessReqDto {
+        @Schema(description = "refreshToken", example = "")
+        @NotNull
+        @NotEmpty
+        private String refreshToken;
+    }
+
+    @Builder
+    @Schema
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    //우리가 필요한 정보 하나씩만 받기 위해 DTO를 만듬
     public static class ConfirmReqDto {
         @Schema(description = "username", example = "")
         @NotNull

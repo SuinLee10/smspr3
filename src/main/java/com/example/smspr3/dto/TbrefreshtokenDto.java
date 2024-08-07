@@ -1,14 +1,14 @@
 package com.example.smspr3.dto;
 
-import com.example.smspr3.domain.Tbemail;
+import com.example.smspr3.domain.Tbrefreshtoken;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
-public class TbemailDto {
+
+public class TbrefreshtokenDto {
     @Builder
     @Schema
     @Getter
@@ -17,23 +17,19 @@ public class TbemailDto {
     @NoArgsConstructor
     //우리가 필요한 정보 하나씩만 받기 위해 DTO를 만듬
     public static class CreateReqDto{
-        @Schema(description = "username", example = "")
+        @Schema(description = "tbuserId", example = "")
         @NotNull
         @NotEmpty
         @Size(max=400)
-        private String username;
-        @Schema(description = "number", example = "")
+        private String tbuserId;
+        @Schema(description = "token", example = "")
         @NotNull
         @NotEmpty
-        private String number;
-        //실제로 고객이 보내는 정보가 아님.
-        @Schema(description = "due", example = "")
-        @NotNull
-        @NotEmpty
-        private String due;
+        @Size(max=100)
+        private String token;
 
-        public Tbemail toEntity(){
-            return Tbemail.of(username, number, due);
+        public Tbrefreshtoken toEntity(){
+            return Tbrefreshtoken.of(tbuserId, token);
         }
     }
 
@@ -46,6 +42,5 @@ public class TbemailDto {
     public static class CreateResDto{
         private String id;
     }
-
 
 }

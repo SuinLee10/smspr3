@@ -6,6 +6,7 @@ import com.example.smspr3.dto.TbuserDto;
 import java.util.List;
 
 public interface TbuserService {
+    TbuserDto.CreateResDto access(TbuserDto.AccessReqDto param);
     TbuserDto.CreateResDto confirm(TbuserDto.ConfirmReqDto param);
     TbuserDto.CreateResDto email(TbuserDto.UidReqDto param);
     TbuserDto.CreateResDto id(TbuserDto.UidReqDto param);
