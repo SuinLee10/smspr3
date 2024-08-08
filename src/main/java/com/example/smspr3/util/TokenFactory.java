@@ -9,12 +9,15 @@ import java.util.Date;
 @Component
 public class TokenFactory {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    //token 생성
     public String generate(String tbuserId, long sec){
         long expiredMillSec = 0;
         Date nowDate = new Date();
+        //현재 시각
         logger.info("now : " + nowDate.getTime());
         nowDate.setTime(nowDate.getTime() + sec * 1000);
         expiredMillSec = nowDate.getTime();
+        //expired 시간
         logger.info("expiredMillSec : " + expiredMillSec);
         String token = "";
         try{
